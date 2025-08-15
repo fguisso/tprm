@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checklist Interativo de Segurança de Fornecedores</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f7f4;
+            color: #3a3a3a;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+        }
+        .nav-link.active {
+            background-color: #eaddd7;
+            color: #5f4c42;
+            font-weight: 600;
+        }
+        .nav-link:hover {
+            background-color: #f0e7e2;
+        }
+        .checklist-item-header {
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .checklist-item-header:hover {
+            background-color: #f0e7e2;
+        }
+        .checklist-item-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+            padding: 0 1rem;
+        }
+        .checklist-item.open .checklist-item-body {
+            max-height: 1000px;
+            padding: 1rem;
+        }
+        .tag {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .tag-obrigatorio {
+            background-color: #c34a4a;
+            color: #ffffff;
+        }
+        .tag-desejavel {
+            background-color: #d4a276;
+            color: #ffffff;
+        }
+        .status-conforme { border-left: 5px solid #4CAF50; }
+        .status-nao-conforme { border-left: 5px solid #F44336; }
+        .status-nao-avaliado { border-left: 5px solid #9E9E9E; }
+    </style>
+</head>
+<body class="flex h-screen">
+
+    <aside class="w-64 bg-[#efebe9] p-6 flex-shrink-0 flex flex-col">
+        <h1 class="text-2xl font-bold text-[#5f4c42] mb-8">Segurança de Fornecedores</h1>
+        <nav class="flex flex-col space-y-2">
+            <a href="#visao-geral" class="nav-link active text-lg p-3 rounded-lg">Visão Geral</a>
+            <a href="#dashboard" class="nav-link text-lg p-3 rounded-lg">Dashboard</a>
+            <a href="#checklist" class="nav-link text-lg p-3 rounded-lg">Checklist Interativo</a>
+        </nav>
+        <div class="mt-auto text-center text-xs text-gray-500">
+            <p>guisso.dev</p>
+        </div>
+    </aside>
+
+    <main class="flex-1 p-6 md:p-10 overflow-y-auto">
+        <section id="visao-geral" class="content-section">
+            <h2 class="text-4xl font-bold text-[#5f4c42] mb-6">Framework Estratégico para Avaliação de Fornecedores</h2>
+            <p class="text-lg mb-4 text-gray-700">
+                Bem-vindo à ferramenta interativa para Gerenciamento de Risco de Terceiros (TPRM). As organizações modernas dependem de uma vasta rede de fornecedores, o que expande a superfície de ataque e torna a avaliação de segurança um pilar crítico para a resiliência do negócio.
+            </p>
+            <p class="text-lg mb-6 text-gray-700">
+                Esta aplicação foi projetada para transformar o processo de avaliação, que vai além da conformidade, em uma análise estruturada e baseada em evidências. Utilize as seções para obter uma visão geral dos princípios, analisar a composição do checklist no dashboard e interagir com cada requisito de segurança.
+            </p>
+            <div class="grid md:grid-cols-3 gap-6 text-center">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <h3 class="text-xl font-semibold text-[#6d5f57] mb-2">Tiering Baseado em Risco</h3>
+                    <p class="text-gray-600">Avalie fornecedores de forma proporcional ao risco que representam, otimizando recursos e focando nos parceiros mais críticos.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <h3 class="text-xl font-semibold text-[#6d5f57] mb-2">Ciclo de Vida do Fornecedor</h3>
+                    <p class="text-gray-600">A segurança deve ser integrada em todas as fases, desde a contratação e monitoramento contínuo até o encerramento do contrato.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <h3 class="text-xl font-semibold text-[#6d5f57] mb-2">Evidência Verificável</h3>
+                    <p class="text-gray-600">Cada requisito deve ser comprovado com evidências concretas, transformando a avaliação de um ato de confiança em um processo de verificação.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="dashboard" class="content-section hidden">
+            <h2 class="text-4xl font-bold text-[#5f4c42] mb-6">Dashboard de Avaliação em Tempo Real</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                Este dashboard oferece uma visão abrangente da sua avaliação. Os gráficos de status são atualizados em tempo real conforme você preenche o checklist, enquanto os gráficos de composição mostram a estrutura dos requisitos.
+            </p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <h3 class="text-xl font-semibold text-center text-[#6d5f57] mb-4">Status Geral dos Controles</h3>
+                    <div class="chart-container">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <h3 class="text-xl font-semibold text-center text-[#6d5f57] mb-4">Distribuição de Controles por Tipo</h3>
+                    <div class="chart-container">
+                        <canvas id="typeChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <h3 class="text-xl font-semibold text-center text-[#6d5f57] mb-4">Status por Domínio de Segurança</h3>
+                    <div class="chart-container h-[400px] md:h-[450px]">
+                        <canvas id="domainStatusChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <h3 class="text-xl font-semibold text-center text-[#6d5f57] mb-4">Controles por Domínio (Tipo)</h3>
+                    <div class="chart-container h-[400px] md:h-[450px]">
+                        <canvas id="domainTypeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="checklist" class="content-section hidden">
+            <h2 class="text-4xl font-bold text-[#5f4c42] mb-2">Checklist Interativo</h2>
+             <p class="text-lg mb-6 text-gray-700">
+                Explore e avalie cada requisito de segurança. Use os filtros para navegar pelos domínios e marque cada item como "Conforme" ou "Não Conforme". Clique no requisito para expandir e ver as evidências necessárias. Suas seleções atualizarão o dashboard instantaneamente.
+            </p>
+            <div id="filters" class="flex flex-wrap gap-2 mb-6">
+                <button class="filter-btn active bg-[#5f4c42] text-white py-2 px-4 rounded-full" data-filter="all">Todos</button>
+            </div>
+            <div id="checklist-container" class="space-y-4">
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const checklistData = [
+                { id: 'GRC-01', domain: 'GRC', requirement: 'O fornecedor possui uma Política de Segurança da Informação formal, documentada, aprovada pela alta gestão e comunicada a todos os funcionários.', type: 'Obrigatório', evidence: 'Cópia da Política de Segurança da Informação, assinada e datada pela gestão executiva; evidência de comunicação interna (e.g., e-mail de divulgação, portal interno).', status: 'Não Avaliado' },
+                { id: 'GRC-02', domain: 'GRC', requirement: 'O fornecedor possui certificações de segurança relevantes (e.g., ISO 27001, SOC 2 Tipo II) e pode fornecer os relatórios de auditoria correspondentes.', type: 'Desejável', evidence: 'Cópia dos certificados de conformidade válidos; Relatório de auditoria SOC 2 Tipo II (completo ou resumo, sob NDA); Relatório de Auditoria Externa.', status: 'Não Avaliado' },
+                { id: 'GRC-03', domain: 'GRC', requirement: 'O fornecedor demonstra conformidade com a Lei Geral de Proteção de Dados (LGPD).', type: 'Obrigatório', evidence: 'Cópia da Política de Privacidade; informações de contato do DPO; cópia do ROPA (se aplicável); Data Processing Agreement (DPA).', status: 'Não Avaliado' },
+                { id: 'GRC-04', domain: 'GRC', requirement: 'O fornecedor conduz um programa de treinamento de conscientização em segurança para todos os funcionários, no mínimo anualmente.', type: 'Obrigatório', evidence: 'Cópia do material de treinamento; registros de conclusão do treinamento pelos funcionários; resultados de campanhas de simulação de phishing.', status: 'Não Avaliado' },
+                { id: 'GRC-05', domain: 'GRC', requirement: 'O fornecedor possui um processo formal para avaliar e gerenciar os riscos de segurança de seus próprios fornecedores (quartas partes).', type: 'Obrigatório', evidence: 'Cópia da política de gerenciamento de risco de terceiros do fornecedor; exemplo de questionário de avaliação de segurança utilizado.', status: 'Não Avaliado' },
+                { id: 'PDP-01', domain: 'PDP', requirement: 'Todos os dados sensíveis do cliente armazenados são criptografados utilizando algoritmos fortes (e.g., AES-256).', type: 'Obrigatório', evidence: 'Documentação da arquitetura de dados detalhando as configurações de criptografia; screenshots de configurações de criptografia em nuvem ou bancos de dados.', status: 'Não Avaliado' },
+                { id: 'PDP-02', domain: 'PDP', requirement: 'Todos os dados transmitidos através de redes são criptografados utilizando protocolos seguros (e.g., TLS 1.2 ou superior).', type: 'Obrigatório', evidence: 'Relatório de varredura de configuração SSL/TLS de endpoints públicos (e.g., Qualys SSL Labs); documentação de configuração de servidores.', status: 'Não Avaliado' },
+                { id: 'PDP-03', domain: 'PDP', requirement: 'O fornecedor possui políticas e procedimentos seguros para o gerenciamento do ciclo de vida das chaves criptográficas.', type: 'Desejável', evidence: 'Cópia da política de gerenciamento de chaves; documentação ou screenshots que evidenciem o uso de um KMS ou HSM.', status: 'Não Avaliado' },
+                { id: 'PDP-04', domain: 'PDP', requirement: 'O fornecedor possui uma política de retenção e descarte seguro de dados e mídias.', type: 'Obrigatório', evidence: 'Cópia da política de retenção e descarte; certificados de destruição de mídias físicas; documentação dos procedimentos de eliminação segura.', status: 'Não Avaliado' },
+                { id: 'CA-01', domain: 'CA', requirement: 'Existe uma política de controle de acesso documentada que define os processos para provisionamento, revisão e revogação de acesso.', type: 'Obrigatório', evidence: 'Cópia da política de controle de acesso.', status: 'Não Avaliado' },
+                { id: 'CA-02', domain: 'CA', requirement: 'A autenticação multifator (MFA) é obrigatória para todo acesso administrativo, remoto e a sistemas com dados sensíveis.', type: 'Obrigatório', evidence: 'Screenshots de configurações de MFA no provedor de identidade (IdP); documentação de políticas de acesso condicional que exigem MFA.', status: 'Não Avaliado' },
+                { id: 'CA-03', domain: 'CA', requirement: 'O acesso é concedido com base no princípio do menor privilégio e em funções de trabalho (Role-Based Access Control - RBAC).', type: 'Obrigatório', evidence: 'Matriz de controle de acesso (matriz de funções e permissões); exemplos de perfis de usuário configurados em sistemas chave.', status: 'Não Avaliado' },
+                { id: 'CA-04', domain: 'CA', requirement: 'São realizadas revisões periódicas (no mínimo trimestrais) dos direitos de acesso dos usuários.', type: 'Obrigatório', evidence: 'Registros das últimas campanhas de revisão de acesso, com evidências de aprovações por gestores e revogações de acesso executadas.', status: 'Não Avaliado' },
+                { id: 'SOI-01', domain: 'SOI', requirement: 'O fornecedor possui um processo contínuo para gerenciar vulnerabilidades, com SLAs definidos para a aplicação de patches.', type: 'Obrigatório', evidence: 'Cópia da política de gerenciamento de vulnerabilidades; relatório de varredura de vulnerabilidades recente.', status: 'Não Avaliado' },
+                { id: 'SOI-02', domain: 'SOI', requirement: 'Os ativos são configurados de acordo com benchmarks de segurança reconhecidos (hardening).', type: 'Desejável', evidence: 'Documentação de imagens de base (golden images) ou scripts de automação de configuração; relatórios de ferramentas de verificação de conformidade.', status: 'Não Avaliado' },
+                { id: 'SOI-03', domain: 'SOI', requirement: 'Soluções de proteção contra malware estão implementadas em todos os servidores e endpoints.', type: 'Obrigatório', evidence: 'Screenshots do console de gerenciamento da solução anti-malware, mostrando cobertura e status de atualização.', status: 'Não Avaliado' },
+                { id: 'SOI-04', domain: 'SOI', requirement: 'Logs de auditoria e segurança são coletados, correlacionados e retidos por um período definido.', type: 'Obrigatório', evidence: 'Cópia da política de gerenciamento de logs; exemplos de alertas configurados em uma ferramenta SIEM; documentação da arquitetura de coleta de logs.', status: 'Não Avaliado' },
+                { id: 'RICN-01', domain: 'RICN', requirement: 'O fornecedor possui um Plano de Resposta a Incidentes (IRP) documentado e testado anualmente.', type: 'Obrigatório', evidence: 'Cópia do IRP; relatório do último teste de simulação; definição de SLAs para notificação de incidentes ao cliente.', status: 'Não Avaliado' },
+                { id: 'RICN-02', domain: 'RICN', requirement: 'O fornecedor possui Planos de Continuidade de Negócios (BCP) e Recuperação de Desastres (DRP) documentados.', type: 'Obrigatório', evidence: 'Cópia do BCP e DRP; relatório do último teste de DRP, demonstrando o cumprimento dos RTOs e RPOs.', status: 'Não Avaliado' },
+                { id: 'RICN-03', domain: 'RICN', requirement: 'Existem procedimentos de backup definidos e testados periodicamente.', type: 'Obrigatório', evidence: 'Cópia da política de backup; logs ou relatórios dos últimos testes de restauração bem-sucedidos.', status: 'Não Avaliado' },
+            ];
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('.content-section');
+            const domainMap = {
+                'GRC': 'Governança, Risco e Conformidade',
+                'PDP': 'Proteção de Dados e Privacidade',
+                'CA': 'Controle de Acesso',
+                'SOI': 'Segurança Operacional e Infra.',
+                'RICN': 'Resposta a Incidentes e Continuidade'
+            };
+
+            function navigateTo(hash) {
+                sections.forEach(section => section.classList.add('hidden'));
+                const targetSection = document.querySelector(hash);
+                if (targetSection) {
+                    targetSection.classList.remove('hidden');
+                }
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === hash) {
+                        link.classList.add('active');
+                    }
+                });
+                if (hash === '#dashboard') {
+                    renderCharts();
+                }
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const hash = e.currentTarget.getAttribute('href');
+                    window.location.hash = hash;
+                });
+            });
+
+            window.addEventListener('hashchange', () => navigateTo(window.location.hash || '#visao-geral'));
+            navigateTo(window.location.hash || '#visao-geral');
+
+            const checklistContainer = document.getElementById('checklist-container');
+            const filtersContainer = document.getElementById('filters');
+            let activeFilter = 'all';
+
+            const domains = [...new Set(checklistData.map(item => item.domain))];
+            domains.forEach(domain => {
+                const button = document.createElement('button');
+                button.className = 'filter-btn bg-gray-200 text-gray-700 py-2 px-4 rounded-full';
+                button.textContent = domainMap[domain];
+                button.dataset.filter = domain;
+                filtersContainer.appendChild(button);
+            });
+
+            function getStatusClass(status) {
+                if (status === 'Conforme') return 'status-conforme';
+                if (status === 'Não Conforme') return 'status-nao-conforme';
+                return 'status-nao-avaliado';
+            }
+
+            function renderChecklist() {
+                const openItems = new Set();
+                document.querySelectorAll('.checklist-item.open').forEach(item => openItems.add(item.dataset.id));
+
+                checklistContainer.innerHTML = '';
+                const filteredData = activeFilter === 'all' ? checklistData : checklistData.filter(item => item.domain === activeFilter);
+                
+                filteredData.forEach(item => {
+                    const itemEl = document.createElement('div');
+                    const isOpen = openItems.has(item.id);
+                    itemEl.className = `checklist-item bg-white rounded-lg shadow-sm ${getStatusClass(item.status)} ${isOpen ? 'open' : ''}`;
+                    itemEl.dataset.id = item.id;
+                    const typeClass = item.type === 'Obrigatório' ? 'tag-obrigatorio' : 'tag-desejavel';
+                    
+                    itemEl.innerHTML = `
+                        <div class="checklist-item-header p-4 flex justify-between items-center">
+                            <div class="flex-1 pr-4">
+                                <p class="font-semibold text-base text-[#3a3a3a]">${item.id}: ${item.requirement}</p>
+                                <p class="text-sm text-gray-500">${domainMap[item.domain]}</p>
+                            </div>
+                            <div class="flex items-center ml-auto">
+                                <span class="tag ${typeClass}">${item.type}</span>
+                                <svg class="w-6 h-6 ml-4 text-gray-500 transform transition-transform flex-shrink-0 ${isOpen ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                        </div>
+                        <div class="checklist-item-body border-t border-gray-200 bg-gray-50">
+                            <div>
+                                <h4 class="font-semibold text-gray-700 mb-2">Exemplos de Evidências Comprobatórias:</h4>
+                                <p class="text-gray-600 mb-4">${item.evidence}</p>
+                                <div class="flex items-center gap-4">
+                                    <h4 class="font-semibold text-gray-700">Status:</h4>
+                                    <button data-status="Conforme" class="status-btn text-sm py-1 px-3 rounded-full ${item.status === 'Conforme' ? 'bg-green-600 text-white' : 'bg-green-100 text-green-800'}">Conforme</button>
+                                    <button data-status="Não Conforme" class="status-btn text-sm py-1 px-3 rounded-full ${item.status === 'Não Conforme' ? 'bg-red-600 text-white' : 'bg-red-100 text-red-800'}">Não Conforme</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    checklistContainer.appendChild(itemEl);
+                });
+            }
+
+            filtersContainer.addEventListener('click', e => {
+                if (e.target.classList.contains('filter-btn')) {
+                    document.querySelector('.filter-btn.active').classList.remove('active', 'bg-[#5f4c42]', 'text-white');
+                    document.querySelector('.filter-btn.active').classList.add('bg-gray-200', 'text-gray-700');
+                    e.target.classList.add('active', 'bg-[#5f4c42]', 'text-white');
+                    e.target.classList.remove('bg-gray-200', 'text-gray-700');
+                    activeFilter = e.target.dataset.filter;
+                    renderChecklist();
+                }
+            });
+
+            checklistContainer.addEventListener('click', e => {
+                const header = e.target.closest('.checklist-item-header');
+                if (header) {
+                    const item = header.parentElement;
+                    item.classList.toggle('open');
+                    header.querySelector('svg').classList.toggle('rotate-180');
+                }
+
+                const statusBtn = e.target.closest('.status-btn');
+                if (statusBtn) {
+                    const newStatus = statusBtn.dataset.status;
+                    const itemEl = statusBtn.closest('.checklist-item');
+                    const itemId = itemEl.dataset.id;
+                    const itemData = checklistData.find(d => d.id === itemId);
+
+                    if (itemData.status === newStatus) {
+                        itemData.status = 'Não Avaliado';
+                    } else {
+                        itemData.status = newStatus;
+                    }
+                    
+                    renderChecklist(); 
+                    if (window.location.hash === '#dashboard') {
+                        renderCharts();
+                    }
+                }
+            });
+            
+            let statusChartInstance, domainStatusChartInstance, typeChartInstance, domainTypeChartInstance;
+
+            function renderCharts() {
+                // --- Data for Status Charts (Dynamic) ---
+                const statusCounts = checklistData.reduce((acc, item) => {
+                    acc[item.status] = (acc[item.status] || 0) + 1;
+                    return acc;
+                }, {});
+
+                const domainStatusCounts = checklistData.reduce((acc, item) => {
+                    const domainName = domainMap[item.domain];
+                    if (!acc[domainName]) {
+                        acc[domainName] = { 'Conforme': 0, 'Não Conforme': 0, 'Não Avaliado': 0 };
+                    }
+                    acc[domainName][item.status]++;
+                    return acc;
+                }, {});
+
+                // --- Data for Type Charts (Static) ---
+                const mandatoryCount = checklistData.filter(item => item.type === 'Obrigatório').length;
+                const desirableCount = checklistData.filter(item => item.type === 'Desejável').length;
+
+                const domainTypeCounts = checklistData.reduce((acc, item) => {
+                    const domainName = domainMap[item.domain];
+                    if (!acc[domainName]) {
+                        acc[domainName] = { 'Obrigatório': 0, 'Desejável': 0 };
+                    }
+                    acc[domainName][item.type]++;
+                    return acc;
+                }, {});
+                
+                const domainOrder = Object.keys(domainMap).map(key => domainMap[key]);
+
+
+                // --- Render Chart 1: Status Geral (Doughnut) ---
+                const statusCtx = document.getElementById('statusChart').getContext('2d');
+                if(statusChartInstance) statusChartInstance.destroy();
+                statusChartInstance = new Chart(statusCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Conforme', 'Não Conforme', 'Não Avaliado'],
+                        datasets: [{
+                            data: [statusCounts['Conforme'] || 0, statusCounts['Não Conforme'] || 0, statusCounts['Não Avaliado'] || 0],
+                            backgroundColor: ['#4CAF50', '#F44336', '#9E9E9E'],
+                            borderColor: '#ffffff',
+                            borderWidth: 3
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 14 } } } } }
+                });
+
+                // --- Render Chart 2: Distribuição por Tipo (Doughnut) ---
+                const typeCtx = document.getElementById('typeChart').getContext('2d');
+                if(typeChartInstance) typeChartInstance.destroy();
+                typeChartInstance = new Chart(typeCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Obrigatório', 'Desejável'],
+                        datasets: [{
+                            data: [mandatoryCount, desirableCount],
+                            backgroundColor: ['#c34a4a', '#d4a276'],
+                            borderColor: '#ffffff',
+                            borderWidth: 3
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 14 } } } } }
+                });
+
+
+                // --- Render Chart 3: Status por Domínio (Stacked Bar) ---
+                const domainStatusCtx = document.getElementById('domainStatusChart').getContext('2d');
+                if(domainStatusChartInstance) domainStatusChartInstance.destroy();
+                domainStatusChartInstance = new Chart(domainStatusCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: domainOrder,
+                        datasets: [
+                            { label: 'Conforme', data: domainOrder.map(d => domainStatusCounts[d] ? domainStatusCounts[d]['Conforme'] : 0), backgroundColor: '#4CAF50' },
+                            { label: 'Não Conforme', data: domainOrder.map(d => domainStatusCounts[d] ? domainStatusCounts[d]['Não Conforme'] : 0), backgroundColor: '#F44336' },
+                            { label: 'Não Avaliado', data: domainOrder.map(d => domainStatusCounts[d] ? domainStatusCounts[d]['Não Avaliado'] : 0), backgroundColor: '#9E9E9E' }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { x: { stacked: true, ticks: { font: { size: 12 } } }, y: { stacked: true, beginAtZero: true } },
+                        plugins: { legend: { position: 'bottom', labels: { font: { size: 14 } } } }
+                    }
+                });
+
+                // --- Render Chart 4: Controles por Domínio (Tipo) (Stacked Bar) ---
+                const domainTypeCtx = document.getElementById('domainTypeChart').getContext('2d');
+                if(domainTypeChartInstance) domainTypeChartInstance.destroy();
+                domainTypeChartInstance = new Chart(domainTypeCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: domainOrder,
+                        datasets: [
+                            {
+                                label: 'Obrigatório',
+                                data: domainOrder.map(d => domainTypeCounts[d] ? domainTypeCounts[d]['Obrigatório'] : 0),
+                                backgroundColor: '#c34a4a',
+                            },
+                            {
+                                label: 'Desejável',
+                                data: domainOrder.map(d => domainTypeCounts[d] ? domainTypeCounts[d]['Desejável'] : 0),
+                                backgroundColor: '#d4a276',
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { x: { stacked: true, ticks: { font: { size: 12 } } }, y: { stacked: true, beginAtZero: true } },
+                        plugins: { legend: { position: 'bottom', labels: { font: { size: 14 } } } }
+                    }
+                });
+            }
+
+            renderChecklist();
+        });
+    </script>
+</body>
+</html>
